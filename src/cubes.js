@@ -304,7 +304,7 @@ export function createCubes(scene, world, animals, { player, camera, toast }) {
     el.innerHTML = types.map((c, i) => {
       const n = state.counts[c.id];
       if (c.admin && !(n > 0)) return '';
-      return `<div class="slot${i === state.selected ? ' sel' : ''}${n > 0 ? '' : ' empty'}" style="--glow:${c.glow}">
+      return `<div class="slot${i === state.selected ? ' sel' : ''}${n > 0 ? '' : ' empty'}" data-i="${i}" style="--glow:${c.glow}">
         <span class="key">${i + 1}</span><img src="${looks[c.id].icon}" alt=""><span class="cnt">${n === Infinity ? '∞' : n}</span>
         <span class="nm">${c.name}</span></div>`;
     }).join('');

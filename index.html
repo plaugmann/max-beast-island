@@ -2,9 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Beast Island</title>
-<link rel="icon" href="data:,">
+<link rel="icon" href="icon-192.png">
+<!-- iPad: "Add to Home Screen" opens full screen like an app -->
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Beast Island">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
 <style>
@@ -201,6 +208,34 @@
   #talk .txt { font-size: 21px; font-weight: 700; line-height: 1.4; }
   #talk .next { position: absolute; right: 18px; bottom: 10px; font-size: 13px; font-weight: 800; opacity: 0; }
   #talk.done .next { opacity: .75; animation: pulse 1s infinite; }
+
+  /* Touch controls (html.touch is set by src/touch.js) */
+  .touch, .touch body { touch-action: none; -webkit-touch-callout: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+  #touch { display: none; }
+  .touch #touch { display: block; }
+  .touch #help, .touch #lock-hint, .touch #hotbar .key { display: none; }
+  .touch #hotbar, .touch #tut-hint, .touch #prompt.show { pointer-events: auto; }
+  .touch #cube-info { max-width: calc(100vw - 440px); }
+  .touch #gp-close { width: 48px; height: 48px; }
+  #stick { position: absolute; left: 120px; bottom: 120px; width: 140px; height: 140px; margin: 0 0 -70px -70px; border-radius: 50%; pointer-events: none;
+    background: rgba(255,255,255,.08); border: 3px solid rgba(255,255,255,.28); opacity: .5; transition: opacity .2s; }
+  #stick.active { opacity: 1; }
+  #stick-knob { position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px; border-radius: 50%;
+    background: rgba(255,255,255,.6); box-shadow: 0 4px 12px rgba(0,0,0,.4); }
+  #stick-knob.run { background: #ffd23a; box-shadow: 0 0 18px #ffb300; }
+  .tbtn { position: absolute; pointer-events: auto; touch-action: none; width: 80px; height: 80px; border-radius: 50%; font-family: 'Lilita One', sans-serif;
+    font-size: 16px; color: #fff; background: rgba(8,16,28,.55); border: 3px solid rgba(255,255,255,.3); backdrop-filter: blur(6px);
+    text-shadow: 0 2px 0 rgba(0,0,0,.5); transition: transform .08s; }
+  .tbtn.down { transform: scale(.9); filter: brightness(1.4); }
+  .tbtn b { display: block; font-size: 28px; line-height: 1; color: #ffe27a; }
+  #t-throw { right: 28px; bottom: 28px; width: 112px; height: 112px; font-size: 21px; color: #3a2400; text-shadow: none;
+    background: linear-gradient(180deg, #ffe066, #ffb300); border-color: #a86a00; box-shadow: 0 6px 0 #a86a00, 0 10px 24px rgba(0,0,0,.4); }
+  #t-jump { right: 152px; bottom: 112px; }
+  #t-use { right: 44px; bottom: 156px; }
+  .tbtn.small { right: 16px; width: 64px; height: 64px; border-radius: 16px; font-size: 13px; }
+  .tbtn.small b { font-size: 24px; }
+  #t-map { top: 112px; }
+  #t-bag { top: 186px; }
 </style>
 <script type="importmap">
 { "imports": {
@@ -243,6 +278,14 @@
   <div id="tut-pointer"><div class="lb"></div><div class="ar"></div></div>
   <div id="big-banner"></div>
   <div id="toast"></div>
+  <div id="touch">
+    <div id="stick"><div id="stick-knob"></div></div>
+    <button id="t-throw" class="tbtn">THROW</button>
+    <button id="t-jump" class="tbtn">JUMP</button>
+    <button id="t-use" class="tbtn"><b>E</b>USE</button>
+    <button id="t-map" class="tbtn small"><b>🗺️</b>MAP</button>
+    <button id="t-bag" class="tbtn small"><b>🎒</b>BAG</button>
+  </div>
 </div>
 <div id="talk"><div class="who"></div><div class="txt"></div><div class="next">E / click ▶</div></div>
 <div id="lock-hint">Click to look around</div>

@@ -27,6 +27,7 @@ import { createIntro } from './intro.js';
 import { createNPCs } from './npcs.js';
 import { loadSave, applySave, createSave } from './save.js';
 import { RARITY } from './data.js';
+import { IS_TOUCH, createTouch } from './touch.js';
 
 const $ = (id) => document.getElementById(id);
 const setProgress = async (pct, text) => {
@@ -38,7 +39,9 @@ const setProgress = async (pct, text) => {
 async function main() {
   const canvas = $('game');
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  // Lower resolution and MSAA on tablets/phones; ?pr=1.5 overrides
+  const pr = +(new URLSearchParams(location.search).get('pr') ?? (IS_TOUCH ? 1 : 1.5));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, pr));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -105,7 +108,7 @@ async function main() {
   createAdmin(game); // P = admin panel (testing only)
 
   // Post-processing: HDR + MSAA, soft bloom on lava, crystals and the sun
-  const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 });
+  const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: IS_TOUCH ? 2 : 4 });
   const composer = new EffectComposer(renderer, rt);
   composer.setPixelRatio(renderer.getPixelRatio());
   composer.setSize(window.innerWidth, window.innerHeight);
@@ -131,6 +134,8 @@ async function main() {
     KeyD: 'right', ArrowRight: 'right', ShiftLeft: 'sprint', ShiftRight: 'sprint', Space: 'jump',
   };
   let mapOpen = false, invOpen = false;
+  // Mouse look needs pointer lock; touch screens have none (iPad Safari throws)
+  const lock = () => { if (!IS_TOUCH) canvas.requestPointerLock?.()?.catch?.(() => {}); };
   const setMap = (open) => {
     if (open && invOpen) setInv(false);
     mapOpen = open;
@@ -143,7 +148,7 @@ async function main() {
     $('inventory').classList.toggle('show', open);
     camCtl.enabled = !open;
     if (open) { cubes.renderInventory(); document.exitPointerLock?.(); }
-    else if ($('loading').classList.contains('gone')) canvas.requestPointerLock();
+    else if ($('loading').classList.contains('gone')) lock();
   };
   window.addEventListener('keydown', (e) => {
     if (game.onKey.some((f) => f(e))) return;
@@ -156,16 +161,17 @@ async function main() {
   });
   window.addEventListener('keyup', (e) => { if (keymap[e.code]) input[keymap[e.code]] = false; });
   window.addEventListener('blur', () => { for (const k in input) input[k] = false; });
+  if (IS_TOUCH) createTouch(game, canvas);
 
   $('play').addEventListener('click', () => {
-    canvas.requestPointerLock();
+    lock();
     intro.play(() => {
       $('loading').classList.add('gone');
       $('hud').classList.remove('hidden');
-      setTimeout(() => toast('You crash-landed on Beast Island! Press Q for the map'), 900);
+      setTimeout(() => toast(`You crash-landed on Beast Island! ${IS_TOUCH ? 'Tap MAP' : 'Press Q'} for the map`), 900);
     });
   });
-  canvas.addEventListener('click', () => { if (!mapOpen && !invOpen && !game.panels.size) canvas.requestPointerLock(); });
+  canvas.addEventListener('click', () => { if (!mapOpen && !invOpen && !game.panels.size) lock(); });
   canvas.addEventListener('mousedown', (e) => {
     if (e.button === 0 && document.pointerLockElement === canvas && !mapOpen && !invOpen && !game.panels.size) cubes.throwCube();
   });

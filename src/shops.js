@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import { FEATURES } from './world.js';
 import { RARITY, fmtMoney } from './data.js';
+import { IS_TOUCH } from './touch.js';
 
 const $ = (id) => document.getElementById(id);
 const rnd = (s) => () => ((s = Math.imul(s ^ (s >>> 15), 2246822519) + 0x9e3779b9 | 0) >>> 0) / 4294967296;
@@ -174,7 +175,7 @@ export function createUI(game) {
     game.panels.add('panel');
     $('gp-title').textContent = opts.title; $('gp-title').style.color = opts.color || '#ffe27a';
     $('gp-sub').textContent = opts.sub || '';
-    $('gp-note').textContent = opts.note || '';
+    $('gp-note').textContent = IS_TOUCH ? (opts.note || '').replace(' (E / Esc to close)', '') : opts.note || '';
     renderPanel();
     $('gpanel').classList.add('show');
     document.exitPointerLock?.();
@@ -409,7 +410,7 @@ export function createShops(game) {
   function openCubeShop() {
     game.onShop?.('cubeShop');
     game.ui.openPanel('cubeShop', {
-      title: 'CUBE SHOP', sub: 'Better cubes catch rarer animals', color: '#8fe3ff', note: 'Press 1-5 in the game to pick a cube. (E / Esc to close)',
+      title: 'CUBE SHOP', sub: 'Better cubes catch rarer animals', color: '#8fe3ff', note: IS_TOUCH ? 'Tap a cube in the bar at the bottom to pick it.' : 'Press 1-5 in the game to pick a cube. (E / Esc to close)',
       render() {
         return `<div class="gp-shop">${cubes.types.filter((c) => !c.admin).map((c) => {
           const have = st.counts[c.id] ?? 0, best = c.chances.map((p, k) => p > 0 ? k : -1).filter((k) => k >= 0).pop();

@@ -1,11 +1,14 @@
 // New-game tutorial: 1 Master Cube → follow the arrow → aim → throw. Then 15 Rusty Cubes and soft follow-up tips.
 import * as THREE from 'three';
 import { ANIMALS, START_CUBES, TUTORIAL_CUBES } from './data.js';
+import { IS_TOUCH } from './touch.js';
 
 const $ = (id) => document.getElementById(id);
-const STEPS = ['Follow the arrow to the animal', 'Aim at it with the mouse (crosshair)', 'Left click to throw your Master Cube!'];
+const STEPS = IS_TOUCH
+  ? ['Follow the arrow to the animal', 'Drag on the screen to aim (crosshair)', 'Tap THROW to throw your Master Cube!']
+  : ['Follow the arrow to the animal', 'Aim at it with the mouse (crosshair)', 'Left click to throw your Master Cube!'];
 const TIPS = [
-  { text: 'Put your animal in your base', sub: 'Follow the arrow, then press <b>E</b> at a pedestal' },
+  { text: 'Put your animal in your base', sub: `Follow the arrow, then ${IS_TOUCH ? 'tap' : 'press'} <b>E</b> at a pedestal` },
   { text: 'Collect your money', sub: 'Your animal earns money every second – step on the glowing <b>COLLECT</b> pad' },
   { text: 'Sell animals & buy cubes', sub: 'Sell animals at the <b>Market</b>, buy better cubes at the <b>Cube Shop</b> (near spawn)' },
 ];
@@ -117,7 +120,7 @@ export function createTutorial(game, saved) {
       }
       if (ready && tut.tip < TIPS.length) {
         const tip = TIPS[tut.tip];
-        setHint(`<div class="tt">TIP ${tut.tip + 1}/${TIPS.length}</div><div class="st cur">${tip.text}</div><div class="sub">${tip.sub}</div><div class="skip">Enter: skip tip</div>`);
+        setHint(`<div class="tt">TIP ${tut.tip + 1}/${TIPS.length}</div><div class="st cur">${tip.text}</div><div class="sub">${tip.sub}</div><div class="skip">${IS_TOUCH ? 'Tap to skip tip' : 'Enter: skip tip'}</div>`);
         const atBase = B && (B.inside(player.pos) || B.door.distanceTo(player.pos) < 5);
         if (B && tut.tip === 0) { target = atBase ? B.nearestEmpty(player.pos) : B.door; targetLabel = atBase ? 'Pedestal' : 'Your Base'; }
         if (B && tut.tip === 1) { target = atBase ? B.pad : B.door; targetLabel = atBase ? 'COLLECT pad' : 'Your Base'; }
