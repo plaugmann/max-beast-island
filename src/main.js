@@ -28,6 +28,7 @@ import { createNPCs } from './npcs.js';
 import { loadSave, applySave, createSave } from './save.js';
 import { RARITY } from './data.js';
 import { IS_TOUCH, createTouch } from './touch.js';
+import { QUALITY, loadQuality, pixelRatio, createSettings } from './settings.js';
 
 const $ = (id) => document.getElementById(id);
 const setProgress = async (pct, text) => {
@@ -39,11 +40,11 @@ const setProgress = async (pct, text) => {
 async function main() {
   const canvas = $('game');
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
-  // Lower resolution and MSAA on tablets/phones; ?pr=1.5 overrides
-  const pr = +(new URLSearchParams(location.search).get('pr') ?? (IS_TOUCH ? 1 : 1.5));
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, pr));
+  // Graphics quality (Normal / Low) from the settings panel; lower resolution and MSAA on tablets/phones
+  const quality = QUALITY[loadQuality()];
+  renderer.setPixelRatio(pixelRatio(loadQuality()));
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.enabled = quality.shadows;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -108,7 +109,7 @@ async function main() {
   createAdmin(game); // P = admin panel (testing only)
 
   // Post-processing: HDR + MSAA, soft bloom on lava, crystals and the sun
-  const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: IS_TOUCH ? 2 : 4 });
+  const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: quality.samples });
   const composer = new EffectComposer(renderer, rt);
   composer.setPixelRatio(renderer.getPixelRatio());
   composer.setSize(window.innerWidth, window.innerHeight);
@@ -116,9 +117,12 @@ async function main() {
   composer.addPass(renderPass);
   const bloom = new THREE.Vector2(window.innerWidth, window.innerHeight);
   const qb = new URLSearchParams(location.search);
-  composer.addPass(new UnrealBloomPass(bloom, +(qb.get('bs') ?? 0.5), 0.6, +(qb.get('bt') ?? 4.0)));
+  const bloomPass = new UnrealBloomPass(bloom, +(qb.get('bs') ?? 0.5), 0.6, +(qb.get('bt') ?? 4.0));
+  bloomPass.enabled = quality.bloom;
+  composer.addPass(bloomPass);
   composer.addPass(new OutputPass());
   const intro = createIntro(game, renderPass); // cutscene after PLAY
+  createSettings(game, { renderer, composer, bloomPass }); // ⚙️ / O = graphics quality
 
   await setProgress(96, 'Compiling shaders...');
   sky.update(0, 0, player.pos, camera);

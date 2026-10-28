@@ -8,6 +8,7 @@ Built with Three.js – plain HTML/JS, no build step.
 **https://plaugmann.github.io/max-beast-island/**
 
 Works on a computer (keyboard + mouse) and on iPad (touch).
+If it runs slowly, tap ⚙️ (on the start screen or in the game) and pick **Low** graphics – the choice is remembered.
 
 ### iPad
 1. Open the link above in **Safari**.
@@ -23,6 +24,7 @@ Works on a computer (keyboard + mouse) and on iPad (touch).
 | **E** | Use / talk (or tap the "E" bubble) |
 | **MAP** / **BAG** | Map / inventory (tap again to close) |
 | Tap a cube in the bottom bar | Pick that cube |
+| ⚙️ | Settings: graphics Normal / Low |
 
 ### Computer
 | Key | Action |
@@ -31,6 +33,7 @@ Works on a computer (keyboard + mouse) and on iPad (touch).
 | Mouse | Look · scroll = zoom · click = throw cube |
 | 1–6 | Pick cube |
 | E | Use / talk · Tab = inventory · Q = map · H = hide help |
+| O | Settings: graphics Normal / Low |
 
 ## Run locally
 `index.html` does not work straight from disk (ES modules need a web server).
@@ -43,7 +46,7 @@ Useful URL parameters: `?newgame` (delete the save), `?autoplay` (skip the start
 ## Code
 - `index.html` – UI, CSS, import map for Three.js. `PLAN.md` – the game design (in Danish).
 - `src/main.js` – startup and game loop; every module gets a shared `game` object.
-- `src/touch.js` – touch controls for iPad.
+- `src/touch.js` – touch controls for iPad. `src/settings.js` – graphics quality (Normal / Low).
 - `src/world.js`, `terrain.js`, `sky.js`, `water.js`, `vegetation.js`, … – the island.
 - `src/animals.js`, `cubes.js`, `base.js`, `shops.js`, `npcs.js`, `tutorial.js`, `intro.js` – gameplay.
 - `lib/three/` – a local copy of Three.js.

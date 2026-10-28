@@ -187,7 +187,7 @@ export function createUI(game) {
     panel.onClose?.(); panel = null;
     game.panels.delete('panel');
     $('gpanel').classList.remove('show');
-    if (relock) canvas.requestPointerLock?.()?.catch?.(() => {});
+    if (relock && $('loading').classList.contains('gone')) canvas.requestPointerLock?.()?.catch?.(() => {}); // not on the start screen
   }
   $('gp-body').addEventListener('click', (e) => {
     const el = e.target.closest('[data-act]');

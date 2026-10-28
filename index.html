@@ -148,7 +148,7 @@
   #tut-pointer.edge { transform: translate(-50%, -50%); }
   #tut-pointer .ar { width: 0; height: 0; border-left: 16px solid transparent; border-right: 16px solid transparent; border-bottom: 28px solid #ffd23a; filter: drop-shadow(0 0 6px rgba(255,180,0,.8)) drop-shadow(0 2px 2px #000); order: 2; }
   #tut-pointer .lb { background: rgba(8,16,28,.75); border-radius: 10px; padding: 3px 10px; font-weight: 800; font-size: 14px; white-space: nowrap; margin-bottom: 6px; color: #ffe27a; }
-  #gpanel { position: fixed; inset: 0; z-index: 31; display: flex; align-items: center; justify-content: center; background: rgba(3,10,20,.55);
+  #gpanel { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; background: rgba(3,10,20,.55);
     backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity .2s; }
   #gpanel.show { opacity: 1; pointer-events: auto; }
   #gpanel .panel { position: relative; width: min(820px, 94vw); max-height: 88vh; overflow: auto; background: linear-gradient(180deg, rgba(24,40,64,.96), rgba(10,18,32,.96));
@@ -236,6 +236,19 @@
   .tbtn.small b { font-size: 24px; }
   #t-map { top: 112px; }
   #t-bag { top: 186px; }
+
+  /* Settings: ⚙️ buttons and the Normal / Low choice */
+  #load-gear { top: 20px; right: 20px; cursor: pointer; }
+  #hud-gear { top: 112px; cursor: pointer; }
+  .touch #hud-gear { top: 260px; }
+  .gp-quality { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .gp-q { display: flex; flex-direction: column; gap: 6px; padding: 18px; border-radius: 16px; border: 3px solid rgba(255,255,255,.15); background: rgba(255,255,255,.06);
+    color: #fff; cursor: pointer; text-align: left; font-family: 'Nunito', sans-serif; transition: transform .1s; }
+  .gp-q:hover { transform: translateY(-2px); }
+  .gp-q.sel { border-color: #8fe3ff; background: rgba(143,227,255,.16); box-shadow: 0 0 16px rgba(143,227,255,.4); }
+  .gp-q .qn { font-family: 'Lilita One', sans-serif; font-size: 28px; }
+  .gp-q.sel .qn::after { content: ' ✓'; color: #8fe3ff; }
+  .gp-q .qd { font-size: 15px; font-weight: 700; opacity: .85; line-height: 1.35; }
 </style>
 <script type="importmap">
 { "imports": {
@@ -253,6 +266,7 @@
   <div class="bar"><div id="load-bar"></div></div>
   <div id="load-text">Loading...</div>
   <button id="play" disabled>LOADING</button>
+  <button id="load-gear" class="tbtn small hidden" aria-label="Settings"><b>⚙️</b></button>
 </div>
 
 <div id="hud" class="hidden">
@@ -266,7 +280,9 @@
     <div><b>Click</b>Throw cube · <b>1-5</b>Pick cube</div>
     <div><b>E</b>Use · <b>Tab</b>Inventory</div>
     <div><b>Q</b>Map · <b>H</b>Hide help</div>
+    <div><b>O</b>Settings</div>
   </div>
+  <button id="hud-gear" class="tbtn small hidden" aria-label="Settings"><b>⚙️</b></button>
   <div id="fps" class="chip"></div>
   <div id="money" class="chip">$0</div>
   <div id="crosshair"></div>
